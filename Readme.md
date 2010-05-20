@@ -10,6 +10,12 @@ A node.js module that helps with mocking and behavior verification.
 * Verify that all expected calls have been made in the expected order
 * Restore mocked functions to their original behavior
 
+## Installation
+
+Via [npm](http://github.com/isaacs/npm):
+
+    npm install gently@latest
+
 ## Example
 
 Make sure your dog is working properly:
