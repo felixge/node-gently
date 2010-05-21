@@ -45,8 +45,9 @@ var Gently = require('gently').Gently;
     assert.strictEqual(obj, OBJ);
     assert.strictEqual(method, 'foo');
     assert.deepEqual(args, [1, 2]);
+    return 23;
   };
-  OBJ.foo.apply(SELF, [1, 2]);
+  assert.equal(OBJ.foo.apply(SELF, [1, 2]), 23);
   assert.equal(mockCalled, 1);
 })();
 
