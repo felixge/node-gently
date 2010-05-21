@@ -1,15 +1,19 @@
 require('../common');
-var Gently = require('gently').Gently;
+var Gently = require('gently').Gently
+  , gently;
 
-(function testConstructor() {
-  var gently = new Gently();
+function test(test) {
+  process.removeAllListeners('exit');
+  gently = new Gently();
+  test();
+}
+
+test(function constructor() {
   assert.deepEqual(gently.expectations, []);
-})();
+});
 
-(function testExpect() {
-  var gently = new Gently()
-    , OBJ = {};
-
+test(function expect() {
+  var OBJ = {};
   OBJ.foo = function(x) {
     return x;
   };
@@ -49,12 +53,10 @@ var Gently = require('gently').Gently;
   };
   assert.equal(OBJ.foo.apply(SELF, [1, 2]), 23);
   assert.equal(mockCalled, 1);
-})();
+});
 
-(function testRestore() {
-  var gently = new Gently()
-    , OBJ = {};
-
+test(function restore() {
+  var OBJ = {};
   OBJ.foo = function(x) {
     return x;
   };
@@ -76,11 +78,10 @@ var Gently = require('gently').Gently;
       assert.equal(e.message, '[my object].foo() is not gently mocked');
     }
   })();
-})();
+});
 
-(function testMock() {
-  var gently = new Gently()
-    , OBJ1 = {toString: function() {return '[OBJ 1]'}}
+test(function mock() {
+  var OBJ1 = {toString: function() {return '[OBJ 1]'}}
     , OBJ2 = {toString: function() {return '[OBJ 2]'}}
     , SELF = {};
 
@@ -116,12 +117,10 @@ var Gently = require('gently').Gently;
     OBJ2.bar();
     assert.equal(gently.expectations.length, 0);
   })();
-})();
+});
 
-(function testVerify() {
-  var gently = new Gently()
-    , OBJ = {toString: function() {return '[OBJ]'}};
-
+test(function verify() {
+  var OBJ = {toString: function() {return '[OBJ]'}};
   gently.verify();
 
   gently.expect(OBJ, 'foo');
@@ -131,18 +130,14 @@ var Gently = require('gently').Gently;
   } catch (e) {
     assert.equal(e.message, 'Expected call to [OBJ].foo did not happen');
   }
-})();
+});
 
-(function testProcessExit() {
-  process.removeAllListeners('exit');
-
-  var gently = new Gently()
-    , verifyCalled = 0;
-
+test(function processExit() {
+  var verifyCalled = 0;
   gently.verify = function() {
     verifyCalled++;
   };
 
   process.emit('exit');
   assert.equal(verifyCalled, 1);
-})();
+});
