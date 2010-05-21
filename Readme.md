@@ -71,9 +71,11 @@ Creates an expectation for an objects method to be called. You can optionally sp
 
 Restores an object method that has been previously overwritten using `gently.expect()`.
 
-#### gently.verify()
+#### gently.verify([msg])
 
 Verifies that all expectations of this gently instance have been satisfied. If not called manually, this method is called when the process `'exit'` event is fired.
+
+If `msg` is given, it will appear in any error that might be thrown.
 
 ## License
 

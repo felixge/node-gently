@@ -12,6 +12,10 @@ test(function constructor() {
   assert.deepEqual(gently.expectations, []);
 });
 
+test(function toString() {
+  assert.deepEqual(gently.toString(), '[Gently]');
+});
+
 test(function expect() {
   var OBJ = {};
   OBJ.foo = function(x) {
@@ -130,12 +134,20 @@ test(function verify() {
   } catch (e) {
     assert.equal(e.message, 'Expected call to [OBJ].foo did not happen');
   }
+
+  try {
+    gently.verify('foo');
+    assert.ok(false, 'throw needs to happen');
+  } catch (e) {
+    assert.equal(e.message, 'Expected call to [OBJ].foo did not happen (foo)');
+  }
 });
 
 test(function processExit() {
   var verifyCalled = 0;
-  gently.verify = function() {
+  gently.verify = function(msg) {
     verifyCalled++;
+    assert.equal(msg, 'process exit');
   };
 
   process.emit('exit');
