@@ -4,5 +4,5 @@ var path = require('path')
 require.paths.unshift(path.dirname(__dirname)+'/lib');
 
 global.puts = sys.puts;
-global.p = sys.p;
+global.p = function() {sys.puts(sys.inspect.apply(null, arguments))};;
 global.assert = require('assert');

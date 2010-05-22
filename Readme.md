@@ -67,6 +67,14 @@ Creates a new gently instance. It listens to the process `'exit'` event to make 
 
 Creates an expectation for an objects method to be called. You can optionally specify the call `count` you are expecting, as well as `mock` function that will run instead of the original function.
 
+#### gently.expect([count], mock)
+
+Returns a function that is supposed to be executed `count` times, delegating any calls to the provided `mock` function. Naming your mock closure will help to properly diagnose errors that are being thrown:
+
+    childProcess.exec('ls', gently.expect(function lsCallback(code) {
+      assert.equal(0, code);
+    }));
+
 #### gently.restore(obj, method)
 
 Restores an object method that has been previously overwritten using `gently.expect()`.
