@@ -55,6 +55,8 @@ You can also easily test event emitters with this, for example a simple sequence
       assert.equal(event, 'drain');
     });
 
+For a full read world example, check out this test case: [test-incoming-form.js](http://github.com/felixge/node-formidable/blob/master/test/simple/test-incoming-form.js) (in [node-formdiable](http://github.com/felixge/node-formidable)).
+
 ## API
 
 ### gently.Gently
