@@ -26,7 +26,8 @@ test(function expectObjMethod() {
     , mock = function() {};
 
   (function testAddOne() {
-    gently.expect(OBJ, 'foo', mock);
+    var original = OBJ.foo;
+    assert.strictEqual(gently.expect(OBJ, 'foo', mock), original);
 
     assert.equal(gently.expectations.length, 1);
     var expectation = gently.expectations[0];
