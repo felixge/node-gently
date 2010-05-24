@@ -10,16 +10,17 @@ function test(test) {
 
 test(function constructor() {
   assert.deepEqual(gently.expectations, []);
-});
-
-test(function toString() {
-  assert.deepEqual(gently.toString(), '[Gently]');
+  assert.equal(gently.constructor.name, 'Gently');
 });
 
 test(function expectObjMethod() {
-  var OBJ = {};
+  var OBJ = {}, NAME = 'foobar';
   OBJ.foo = function(x) {
     return x;
+  };
+
+  gently._name = function() {
+    return NAME;
   };
 
   var original = OBJ.foo
@@ -34,7 +35,7 @@ test(function expectObjMethod() {
     assert.strictEqual(expectation.obj, OBJ);
     assert.strictEqual(expectation.method, 'foo');
     assert.strictEqual(expectation.mock, mock);
-    assert.strictEqual(expectation.name, OBJ.toString()+'.foo()');
+    assert.strictEqual(expectation.name, NAME);
     assert.strictEqual(OBJ.foo._original, original);
   })();
 
@@ -54,7 +55,7 @@ test(function expectObjMethod() {
     assert.strictEqual(self, SELF);
     assert.strictEqual(obj, OBJ);
     assert.strictEqual(method, 'foo');
-    assert.strictEqual(name, gently.expectations[0].name);
+    assert.strictEqual(name, NAME);
     assert.deepEqual(args, [1, 2]);
     return 23;
   };
@@ -63,7 +64,12 @@ test(function expectObjMethod() {
 });
 
 test(function expectClosure() {
-  function closureFn() {}
+  var NAME = 'MY CLOSURE';
+  function closureFn() {};
+
+  gently._name = function() {
+    return NAME;
+  };
 
   var fn = gently.expect(closureFn);
   assert.equal(gently.expectations.length, 1);
@@ -71,7 +77,7 @@ test(function expectClosure() {
   assert.strictEqual(expectation.obj, null);
   assert.strictEqual(expectation.method, null);
   assert.strictEqual(expectation.mock, closureFn);
-  assert.strictEqual(expectation.name, 'closureFn()');
+  assert.strictEqual(expectation.name, NAME);
 
   var mockCalled = 0, SELF = {};
   gently._mock = function(self, obj, method, name, args) {
@@ -79,27 +85,22 @@ test(function expectClosure() {
     assert.strictEqual(self, SELF);
     assert.strictEqual(obj, null);
     assert.strictEqual(method, null);
-    assert.strictEqual(name, 'closureFn()');
+    assert.strictEqual(name, NAME);
     assert.deepEqual(args, [1, 2]);
     return 23;
   };
   assert.equal(fn.apply(SELF, [1, 2]), 23);
   assert.equal(mockCalled, 1);
-
-  var noName = function() {return a+a};
-  gently.expect(2, noName);
-  assert.equal(gently.expectations.length, 3);
-  assert.equal(gently.expectations[1].name, '>> '+noName.toString()+' <<');
 });
 
 test(function restore() {
-  var OBJ = {};
+  var OBJ = {}, NAME = '[my object].myFn()';
   OBJ.foo = function(x) {
     return x;
   };
 
-  OBJ.toString = function() {
-    return '[my object]';
+  gently._name = function() {
+    return NAME;
   };
 
   var original = OBJ.foo;
@@ -112,7 +113,7 @@ test(function restore() {
       gently.restore(OBJ, 'foo');
       assert.ok(false, 'throw needs to happen');
     } catch (e) {
-      assert.equal(e.message, '[my object].foo() is not gently mocked');
+      assert.equal(e.message, NAME+' is not gently mocked');
     }
   })();
 });
@@ -144,7 +145,7 @@ test(function mock() {
       gently._mock(SELF, OBJ1, 'foo', 'dummy_name', [5]);
       assert.ok(false, 'throw needs to happen');
     } catch (e) {
-      assert.equal(e.message, 'Unexpected call to dummy_name, expected call to [OBJ 2].bar()');
+      assert.equal(e.message, 'Unexpected call to dummy_name, expected call to '+gently._name(OBJ2, 'bar'));
     }
 
     assert.equal(gently.expectations.length, 1);
@@ -185,4 +186,37 @@ test(function processExit() {
 
   process.emit('exit');
   assert.equal(verifyCalled, 1);
+});
+
+test(function _name() {
+  (function testNamedClass() {
+    function Foo() {};
+    var foo = new Foo();
+    assert.equal(gently._name(foo, 'bar'), '[Foo].bar()');
+  })();
+
+  (function testToStringPreference() {
+    function Foo() {};
+    Foo.prototype.toString = function() {
+      return '[Superman 123]';
+    };
+    var foo = new Foo();
+    assert.equal(gently._name(foo, 'bar'), '[Superman 123].bar()');
+  })();
+
+  (function testUnamedClass() {
+    var Foo = function() {};
+    var foo = new Foo();
+    assert.equal(gently._name(foo, 'bar'), foo.toString()+'.bar()');
+  })();
+
+  (function testNamedClosure() {
+    function myClosure() {};
+    assert.equal(gently._name(null, null, myClosure), myClosure.name+'()');
+  })();
+
+  (function testUnamedClosure() {
+    var myClosure = function() {2+2 == 5};
+    assert.equal(gently._name(null, null, myClosure), '>> '+myClosure.toString()+' <<');
+  })();
 });

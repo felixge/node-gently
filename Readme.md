@@ -9,6 +9,7 @@ A node.js module that helps with mocking and behavior verification.
 * Overwrite and mock individual object functions
 * Verify that all expected calls have been made in the expected order
 * Restore mocked functions to their original behavior
+* Detect object / class names from obj.constructor.name and obj.toString()
 
 ## Installation
 
