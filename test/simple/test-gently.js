@@ -13,6 +13,16 @@ test(function constructor() {
   assert.equal(gently.constructor.name, 'Gently');
 });
 
+test(function expectBadArgs() {
+  var BAD_ARG = 'oh no';
+  try {
+    gently.expect(BAD_ARG);
+    assert.ok(false, 'throw needs to happen');
+  } catch (e) {
+    assert.equal(e.message, 'Bad 1st argument for gently.expect(), object or function expected, got: '+(typeof BAD_ARG));
+  }
+});
+
 test(function expectObjMethod() {
   var OBJ = {}, NAME = 'foobar';
   OBJ.foo = function(x) {
