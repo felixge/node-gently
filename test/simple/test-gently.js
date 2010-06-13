@@ -35,23 +35,23 @@ test(function expectObjMethod() {
   };
 
   var original = OBJ.foo
-    , mock = function() {};
+    , stubFn = function() {};
 
   (function testAddOne() {
     var original = OBJ.foo;
-    assert.strictEqual(gently.expect(OBJ, 'foo', mock), original);
+    assert.strictEqual(gently.expect(OBJ, 'foo', stubFn), original);
 
     assert.equal(gently.expectations.length, 1);
     var expectation = gently.expectations[0];
     assert.strictEqual(expectation.obj, OBJ);
     assert.strictEqual(expectation.method, 'foo');
-    assert.strictEqual(expectation.mock, mock);
+    assert.strictEqual(expectation.stubFn, stubFn);
     assert.strictEqual(expectation.name, NAME);
     assert.strictEqual(OBJ.foo._original, original);
   })();
 
   (function testAddTwo() {
-    gently.expect(OBJ, 'foo', 2, mock);
+    gently.expect(OBJ, 'foo', 2, stubFn);
     assert.equal(gently.expectations.length, 3);
   })();
 
@@ -60,9 +60,9 @@ test(function expectObjMethod() {
     assert.equal(gently.expectations.length, 4);
   })();
 
-  var mockCalled = 0, SELF = {};
-  gently._mock = function(self, obj, method, name, args) {
-    mockCalled++;
+  var stubFnCalled = 0, SELF = {};
+  gently._stubFn = function(self, obj, method, name, args) {
+    stubFnCalled++;
     assert.strictEqual(self, SELF);
     assert.strictEqual(obj, OBJ);
     assert.strictEqual(method, 'foo');
@@ -71,7 +71,7 @@ test(function expectObjMethod() {
     return 23;
   };
   assert.equal(OBJ.foo.apply(SELF, [1, 2]), 23);
-  assert.equal(mockCalled, 1);
+  assert.equal(stubFnCalled, 1);
 });
 
 test(function expectClosure() {
@@ -87,12 +87,12 @@ test(function expectClosure() {
   var expectation = gently.expectations[0];
   assert.strictEqual(expectation.obj, null);
   assert.strictEqual(expectation.method, null);
-  assert.strictEqual(expectation.mock, closureFn);
+  assert.strictEqual(expectation.stubFn, closureFn);
   assert.strictEqual(expectation.name, NAME);
 
-  var mockCalled = 0, SELF = {};
-  gently._mock = function(self, obj, method, name, args) {
-    mockCalled++;
+  var stubFnCalled = 0, SELF = {};
+  gently._stubFn = function(self, obj, method, name, args) {
+    stubFnCalled++;
     assert.strictEqual(self, SELF);
     assert.strictEqual(obj, null);
     assert.strictEqual(method, null);
@@ -101,7 +101,7 @@ test(function expectClosure() {
     return 23;
   };
   assert.equal(fn.apply(SELF, [1, 2]), 23);
-  assert.equal(mockCalled, 1);
+  assert.equal(stubFnCalled, 1);
 });
 
 test(function restore() {
@@ -124,12 +124,12 @@ test(function restore() {
       gently.restore(OBJ, 'foo');
       assert.ok(false, 'throw needs to happen');
     } catch (e) {
-      assert.equal(e.message, NAME+' is not gently mocked');
+      assert.equal(e.message, NAME+' is not gently stubbed');
     }
   })();
 });
 
-test(function mock() {
+test(function _stubFn() {
   var OBJ1 = {toString: function() {return '[OBJ 1]'}}
     , OBJ2 = {toString: function() {return '[OBJ 2]'}}
     , SELF = {};
@@ -139,11 +139,11 @@ test(function mock() {
     return x * 2;
   });
 
-  assert.equal(gently._mock(SELF, OBJ1, 'foo', 'dummy_name', [5]), 10);
+  assert.equal(gently._stubFn(SELF, OBJ1, 'foo', 'dummy_name', [5]), 10);
 
   (function testNoMoreCallExpected() {
     try {
-      gently._mock(SELF, OBJ1, 'foo', 'dummy_name', [5]);
+      gently._stubFn(SELF, OBJ1, 'foo', 'dummy_name', [5]);
       assert.ok(false, 'throw needs to happen');
     } catch (e) {
       assert.equal(e.message, 'Unexpected call to dummy_name, no call was expected');
@@ -153,7 +153,7 @@ test(function mock() {
   (function testDifferentCallExpected() {
     gently.expect(OBJ2, 'bar');
     try {
-      gently._mock(SELF, OBJ1, 'foo', 'dummy_name', [5]);
+      gently._stubFn(SELF, OBJ1, 'foo', 'dummy_name', [5]);
       assert.ok(false, 'throw needs to happen');
     } catch (e) {
       assert.equal(e.message, 'Unexpected call to dummy_name, expected call to '+gently._name(OBJ2, 'bar'));

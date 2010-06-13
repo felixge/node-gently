@@ -67,15 +67,15 @@ For a full read world example, check out this test case: [test-incoming-form.js]
 
 Creates a new gently instance. It listens to the process `'exit'` event to make sure all expectations have been verified.
 
-#### gently.expect(obj, method, [[count], mock])
+#### gently.expect(obj, method, [[count], stubFn])
 
-Creates an expectation for an objects method to be called. You can optionally specify the call `count` you are expecting, as well as `mock` function that will run instead of the original function.
+Creates an expectation for an objects method to be called. You can optionally specify the call `count` you are expecting, as well as `stubFn` function that will run instead of the original function.
 
 Returns a reference to the function that is getting overwritten.
 
-#### gently.expect([count], mock)
+#### gently.expect([count], stubFn)
 
-Returns a function that is supposed to be executed `count` times, delegating any calls to the provided `mock` function. Naming your mock closure will help to properly diagnose errors that are being thrown:
+Returns a function that is supposed to be executed `count` times, delegating any calls to the provided `stubFn` function. Naming your stubFn closure will help to properly diagnose errors that are being thrown:
 
     childProcess.exec('ls', gently.expect(function lsCallback(code) {
       assert.equal(0, code);
