@@ -10,6 +10,7 @@ function test(test) {
 
 test(function constructor() {
   assert.deepEqual(gently.expectations, []);
+  assert.deepEqual(gently.hijacked, {});
   assert.equal(gently.constructor.name, 'Gently');
 });
 
@@ -165,6 +166,68 @@ test(function mock() {
     OBJ2.bar();
     assert.equal(gently.expectations.length, 0);
   })();
+});
+
+test(function stub() {
+  var LOCATION = './my_class';
+
+  (function testRegular() {
+    var Stub = gently.stub(LOCATION);
+    assert.ok(Stub instanceof Function);
+    assert.strictEqual(gently.hijacked[LOCATION], Stub);
+    assert.ok(Stub['new'] instanceof Function);
+    assert.equal(Stub.toString(), 'require('+JSON.stringify(LOCATION)+')');
+
+    (function testConstructor() {
+      var newCalled = 0
+        , STUB
+        , ARGS = ['foo', 'bar'];
+
+      Stub['new'] = function(a, b) {
+        assert.equal(a, ARGS[0]);
+        assert.equal(b, ARGS[1]);
+        newCalled++;
+        STUB = this;
+      };
+
+      var stub = new Stub(ARGS[0], ARGS[1]);
+      assert.strictEqual(stub, STUB);
+      assert.equal(newCalled, 1);
+      assert.equal(stub.toString(), 'require('+JSON.stringify(LOCATION)+')');
+    })();
+  })();
+
+  var EXPORTS_NAME = 'MyClass';
+  test(function testExportsName() {
+    var Stub = gently.stub(LOCATION, EXPORTS_NAME);
+    assert.strictEqual(gently.hijacked[LOCATION][EXPORTS_NAME], Stub);
+    assert.equal(Stub.toString(), 'require('+JSON.stringify(LOCATION)+').'+EXPORTS_NAME);
+
+    (function testConstructor() {
+      var stub = new Stub();
+      assert.equal(Stub.toString(), 'require('+JSON.stringify(LOCATION)+').'+EXPORTS_NAME);
+    })();
+  });
+});
+
+test(function hijack() {
+  var LOCATION = './foo'
+    , REQUIRE_CALLS = 0
+    , EXPORTS = {}
+    , REQUIRE = function() {
+        REQUIRE_CALLS++;
+        return EXPORTS;
+      };
+
+  var hijackedRequire = gently.hijack(REQUIRE);
+  hijackedRequire(LOCATION);
+  assert.strictEqual(gently.hijacked[LOCATION], EXPORTS);
+
+  assert.equal(REQUIRE_CALLS, 1);
+
+  // make sure we are caching the hijacked module
+  hijackedRequire(LOCATION);
+  assert.equal(REQUIRE_CALLS, 1);
 });
 
 test(function verify() {

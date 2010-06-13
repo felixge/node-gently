@@ -10,6 +10,7 @@ A node.js module that helps with stubbing and behavior verification. It allows y
 * Verify that all expected calls have been made in the expected order
 * Restore stubbed functions to their original behavior
 * Detect object / class names from obj.constructor.name and obj.toString()
+* Hijack any required module function or class constructor
 
 ## Installation
 
@@ -83,6 +84,77 @@ Returns a function that is supposed to be executed `count` times, delegating any
 #### gently.restore(obj, method)
 
 Restores an object method that has been previously overwritten using `gently.expect()`.
+
+#### gently.hijack(realRequire)
+
+Returns a new require functions that catches a reference to all required modules into `gently.hijacked`.
+
+To use this function, include a line like this in your `'my-module.js'`.
+
+    if (global.GENTLY) require = GENTLY.hijack(require);
+
+    var sys = require('sys');
+    exports.hello = function() {
+      sys.log('world');
+    };
+
+Now you can write a test for the module above:
+
+    var gently = global.GENTLY = new (require('gently'))
+      , myModule = require('./my-module');
+
+    gently.expect(gently.hijacked.sys, 'log', function(str) {
+      assert.equal(str, 'world');
+    });
+
+    myModule.hello();
+
+#### gently.stub(location, [exportsName])
+
+Returns a stub class that will be used instead of the real class from the module at `location` with the given `exportsName`.
+
+This allows to test an OOP version of the previous example, where `'my-module.js'`.
+
+    if (global.GENTLY) require = GENTLY.hijack(require);
+
+    var World = require('./world');
+
+    exports.hello = function() {
+      var world = new World();
+      world.hello();
+    }
+
+And `world.js` looks like this:
+
+    var sys = require('sys');
+
+    function World() {
+
+    }
+    module.exports = World;
+
+    World.prototype.hello = function() {
+      sys.log('world');
+    };
+
+Testing `'my-module.js'` can now easily be accomplished:
+
+    var gently = global.GENTLY = new (require('gently'))
+      , WorldStub = gently.stub('./world')
+      , myModule = require('./my-module')
+      , WORLD;
+
+    gently.expect(WorldStub, 'new', function() {
+      WORLD = this;
+    });
+
+    gently.expect(WORLD, 'hello');
+
+    myModule.hello();
+
+#### gently.hijacked
+
+An object that holds the references to all hijacked modules.
 
 #### gently.verify([msg])
 
