@@ -10,7 +10,7 @@ Dog.prototype.bark = function(bark) {
   require('sys').puts(bark);
 }
 
-var gently = new (require('gently').Gently)
+var gently = new (require('gently'))
   , assert = require('assert')
   , dog = new Dog();
 

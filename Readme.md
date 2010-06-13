@@ -32,7 +32,7 @@ Make sure your dog is working properly:
       require('sys').puts(bark);
     }
 
-    var gently = new (require('gently').Gently)
+    var gently = new (require('gently'))
       , assert = require('assert')
       , dog = new Dog();
 
@@ -45,7 +45,7 @@ Make sure your dog is working properly:
 
 You can also easily test event emitters with this, for example a simple sequence of 2 events emitted by `fs.WriteStream`:
 
-    var gently = new (require('gently').Gently)
+    var gently = new (require('gently'))
       , stream = new (require('fs').WriteStream)('my_file.txt');
 
     gently.expect(stream, 'emit', function(event) {
@@ -60,9 +60,9 @@ For a full read world example, check out this test case: [test-incoming-form.js]
 
 ## API
 
-### gently.Gently
+### Gently
 
-#### new gently.Gently()
+#### new Gently()
 
 Creates a new gently instance. It listens to the process `'exit'` event to make sure all expectations have been verified.
 

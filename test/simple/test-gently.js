@@ -1,5 +1,5 @@
 require('../common');
-var Gently = require('gently').Gently
+var Gently = require('gently')
   , gently;
 
 function test(test) {
