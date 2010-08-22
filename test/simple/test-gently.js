@@ -38,7 +38,6 @@ test(function expectObjMethod() {
     , stubFn = function() {};
 
   (function testAddOne() {
-    var original = OBJ.foo;
     assert.strictEqual(gently.expect(OBJ, 'foo', stubFn), original);
 
     assert.equal(gently.expectations.length, 1);
@@ -53,6 +52,7 @@ test(function expectObjMethod() {
   (function testAddTwo() {
     gently.expect(OBJ, 'foo', 2, stubFn);
     assert.equal(gently.expectations.length, 3);
+    assert.strictEqual(OBJ.foo._original, original);
   })();
 
   (function testAddOneWithoutMock() {
