@@ -20,7 +20,7 @@ test(function expectBadArgs() {
     gently.expect(BAD_ARG);
     assert.ok(false, 'throw needs to happen');
   } catch (e) {
-    assert.equal(e.message, 'Bad 1st argument for gently.expect(), object or function expected, got: '+(typeof BAD_ARG));
+    assert.equal(e.message, 'Bad 1st argument for gently.expect(), object, function, or number expected, got: '+(typeof BAD_ARG));
   }
 });
 
@@ -102,6 +102,18 @@ test(function expectClosure() {
   };
   assert.equal(fn.apply(SELF, [1, 2]), 23);
   assert.equal(stubFnCalled, 1);
+});
+
+test(function expectClosureCount() {
+  var stubFnCalled = 0;
+  function closureFn() {stubFnCalled++};
+
+  var fn = gently.expect(2, closureFn);
+  assert.equal(gently.expectations.length, 2);
+  fn();
+  assert.equal(gently.expectations.length, 1);
+  fn();
+  assert.equal(stubFnCalled, 2);
 });
 
 test(function restore() {
