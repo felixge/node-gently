@@ -207,6 +207,18 @@ test(function stub() {
       assert.equal(newCalled, 1);
       assert.equal(stub.toString(), 'require('+JSON.stringify(LOCATION)+')');
     })();
+
+    (function testUseReturnValueAsInstance() {
+      var R = {};
+
+      Stub['new'] = function() {
+        return R;
+      };
+
+      var stub = new Stub();
+      assert.strictEqual(stub, R);
+
+    })();
   })();
 
   var EXPORTS_NAME = 'MyClass';
