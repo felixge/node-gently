@@ -51,13 +51,13 @@ test(function expectObjMethod() {
 
   (function testAddTwo() {
     gently.expect(OBJ, 'foo', 2, stubFn);
-    assert.equal(gently.expectations.length, 3);
+    assert.equal(gently.expectations.length, 2);
     assert.strictEqual(OBJ.foo._original, original);
   })();
 
   (function testAddOneWithoutMock() {
     gently.expect(OBJ, 'foo');
-    assert.equal(gently.expectations.length, 4);
+    assert.equal(gently.expectations.length, 3);
   })();
 
   var stubFnCalled = 0, SELF = {};
@@ -109,7 +109,7 @@ test(function expectClosureCount() {
   function closureFn() {stubFnCalled++};
 
   var fn = gently.expect(2, closureFn);
-  assert.equal(gently.expectations.length, 2);
+  assert.equal(gently.expectations.length, 1);
   fn();
   assert.equal(gently.expectations.length, 1);
   fn();
@@ -143,7 +143,7 @@ test(function restore() {
 
 test(function _stubFn() {
   var OBJ1 = {toString: function() {return '[OBJ 1]'}}
-    , OBJ2 = {toString: function() {return '[OBJ 2]'}}
+    , OBJ2 = {toString: function() {return '[OBJ 2]'}, foo: function () {return 'bar';}}
     , SELF = {};
 
   gently.expect(OBJ1, 'foo', function(x) {
@@ -152,6 +152,18 @@ test(function _stubFn() {
   });
 
   assert.equal(gently._stubFn(SELF, OBJ1, 'foo', 'dummy_name', [5]), 10);
+
+  (function testAutorestore() {
+    assert.equal(OBJ2.foo(), 'bar');
+
+    gently.expect(OBJ2, 'foo', function() {
+      return 'stubbed foo';
+    });
+
+    assert.equal(gently._stubFn(SELF, OBJ2, 'foo', 'dummy_name', []), 'stubbed foo');
+    assert.equal(OBJ2.foo(), 'bar');
+    assert.deepEqual(gently.expectations, []);
+  })();
 
   (function testNoMoreCallExpected() {
     try {
