@@ -1,5 +1,13 @@
-{ "name" : "gently"
-, "version": "0.8.0"
-, "directories" : { "lib" : "./lib/gently" }
-, "main" : "./lib/gently/index"
+{
+  "name": "gently",
+  "version": "0.9.0",
+  "directories": {
+    "lib": "./lib/gently"
+  },
+  "main": "./lib/gently/index",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": "*"
+  }
 }
