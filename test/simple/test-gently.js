@@ -160,7 +160,12 @@ test(function _stubFn() {
       return 'stubbed foo';
     });
 
+    gently.expect(OBJ2, 'foo', function() {
+      return "didn't restore yet";
+    });
+
     assert.equal(gently._stubFn(SELF, OBJ2, 'foo', 'dummy_name', []), 'stubbed foo');
+    assert.equal(gently._stubFn(SELF, OBJ2, 'foo', 'dummy_name', []), "didn't restore yet");
     assert.equal(OBJ2.foo(), 'bar');
     assert.deepEqual(gently.expectations, []);
   })();
