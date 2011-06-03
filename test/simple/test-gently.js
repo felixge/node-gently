@@ -334,3 +334,15 @@ test(function _name() {
     assert.equal(gently._name(null, null, myClosure), '>> '+myClosure.toString()+' <<');
   })();
 });
+
+test(function verifyExpectNone() {
+  var OBJ = {toString: function() {return '[OBJ]'}};
+  gently.verify();
+
+  gently.expect(OBJ, 'foo', 0);
+  try {
+    gently.verify();
+  } catch (e) {
+    assert.fail('Exception should not have been thrown');
+  }
+});
