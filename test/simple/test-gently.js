@@ -47,18 +47,18 @@ test(function expectObjMethod() {
     assert.strictEqual(expectation.stubFn, stubFn);
     assert.strictEqual(expectation.name, NAME);
     assert.strictEqual(OBJ.foo._original, original);
-  })();
+  }());
 
   (function testAddTwo() {
     gently.expect(OBJ, 'foo', 2, stubFn);
     assert.equal(gently.expectations.length, 2);
     assert.strictEqual(OBJ.foo._original, original);
-  })();
+  }());
 
   (function testAddOneWithoutMock() {
     gently.expect(OBJ, 'foo');
     assert.equal(gently.expectations.length, 3);
-  })();
+  }());
 
   var stubFnCalled = 0, SELF = {};
   gently._stubFn = function(self, obj, method, name, args) {
@@ -76,7 +76,7 @@ test(function expectObjMethod() {
 
 test(function expectClosure() {
   var NAME = 'MY CLOSURE';
-  function closureFn() {};
+  function closureFn() {}
 
   gently._name = function() {
     return NAME;
@@ -106,7 +106,7 @@ test(function expectClosure() {
 
 test(function expectClosureCount() {
   var stubFnCalled = 0;
-  function closureFn() {stubFnCalled++};
+  function closureFn() {stubFnCalled++;}
 
   var fn = gently.expect(2, closureFn);
   assert.equal(gently.expectations.length, 1);
@@ -138,12 +138,12 @@ test(function restore() {
     } catch (e) {
       assert.equal(e.message, NAME+' is not gently stubbed');
     }
-  })();
+  }());
 });
 
 test(function _stubFn() {
-  var OBJ1 = {toString: function() {return '[OBJ 1]'}}
-    , OBJ2 = {toString: function() {return '[OBJ 2]'}, foo: function () {return 'bar';}}
+  var OBJ1 = {toString: function() {return '[OBJ 1]';}}
+    , OBJ2 = {toString: function() {return '[OBJ 2]';}, foo: function () {return 'bar';}}
     , SELF = {};
 
   gently.expect(OBJ1, 'foo', function(x) {
@@ -161,14 +161,14 @@ test(function _stubFn() {
     });
 
     gently.expect(OBJ2, 'foo', function() {
-      return "didn't restore yet";
+      return 'did not restore yet';
     });
 
     assert.equal(gently._stubFn(SELF, OBJ2, 'foo', 'dummy_name', []), 'stubbed foo');
-    assert.equal(gently._stubFn(SELF, OBJ2, 'foo', 'dummy_name', []), "didn't restore yet");
+    assert.equal(gently._stubFn(SELF, OBJ2, 'foo', 'dummy_name', []), 'did not restore yet');
     assert.equal(OBJ2.foo(), 'bar');
     assert.deepEqual(gently.expectations, []);
-  })();
+  }());
 
   (function testNoMoreCallExpected() {
     try {
@@ -177,7 +177,7 @@ test(function _stubFn() {
     } catch (e) {
       assert.equal(e.message, 'Unexpected call to dummy_name, no call was expected');
     }
-  })();
+  }());
 
   (function testDifferentCallExpected() {
     gently.expect(OBJ2, 'bar');
@@ -189,12 +189,12 @@ test(function _stubFn() {
     }
 
     assert.equal(gently.expectations.length, 1);
-  })();
+  }());
 
   (function testNoMockCallback() {
     OBJ2.bar();
     assert.equal(gently.expectations.length, 0);
-  })();
+  }());
 });
 
 test(function stub() {
@@ -223,7 +223,7 @@ test(function stub() {
       assert.strictEqual(stub, STUB);
       assert.equal(newCalled, 1);
       assert.equal(stub.toString(), 'require('+JSON.stringify(LOCATION)+')');
-    })();
+    }());
 
     (function testUseReturnValueAsInstance() {
       var R = {};
@@ -235,8 +235,8 @@ test(function stub() {
       var stub = new Stub();
       assert.strictEqual(stub, R);
 
-    })();
-  })();
+    }());
+  }());
 
   var EXPORTS_NAME = 'MyClass';
   test(function testExportsName() {
@@ -247,7 +247,7 @@ test(function stub() {
     (function testConstructor() {
       var stub = new Stub();
       assert.equal(Stub.toString(), 'require('+JSON.stringify(LOCATION)+').'+EXPORTS_NAME);
-    })();
+    }());
   });
 });
 
@@ -272,7 +272,7 @@ test(function hijack() {
 });
 
 test(function verify() {
-  var OBJ = {toString: function() {return '[OBJ]'}};
+  var OBJ = {toString: function() {return '[OBJ]';}};
   gently.verify();
 
   gently.expect(OBJ, 'foo');
@@ -286,8 +286,8 @@ test(function verify() {
   try {
     gently.verify('foo');
     assert.ok(false, 'throw needs to happen');
-  } catch (e) {
-    assert.equal(e.message, 'Expected call to [OBJ].foo() did not happen (foo)');
+  } catch (e2) {
+    assert.equal(e2.message, 'Expected call to [OBJ].foo() did not happen (foo)');
   }
 });
 
@@ -304,39 +304,39 @@ test(function processExit() {
 
 test(function _name() {
   (function testNamedClass() {
-    function Foo() {};
+    function Foo() {}
     var foo = new Foo();
     assert.equal(gently._name(foo, 'bar'), '[Foo].bar()');
-  })();
+  }());
 
   (function testToStringPreference() {
-    function Foo() {};
+    function Foo() {}
     Foo.prototype.toString = function() {
       return '[Superman 123]';
     };
     var foo = new Foo();
     assert.equal(gently._name(foo, 'bar'), '[Superman 123].bar()');
-  })();
+  }());
 
   (function testUnamedClass() {
     var Foo = function() {};
     var foo = new Foo();
     assert.equal(gently._name(foo, 'bar'), foo.toString()+'.bar()');
-  })();
+  }());
 
   (function testNamedClosure() {
-    function myClosure() {};
+    function myClosure() {}
     assert.equal(gently._name(null, null, myClosure), myClosure.name+'()');
-  })();
+  }());
 
   (function testUnamedClosure() {
-    var myClosure = function() {2+2 == 5};
+    var myClosure = function() {2+2 === 5;};
     assert.equal(gently._name(null, null, myClosure), '>> '+myClosure.toString()+' <<');
-  })();
+  }());
 });
 
 test(function verifyExpectNone() {
-  var OBJ = {toString: function() {return '[OBJ]'}};
+  var OBJ = {toString: function() {return '[OBJ]';}};
   gently.verify();
 
   gently.expect(OBJ, 'foo', 0);
