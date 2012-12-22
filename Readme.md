@@ -21,42 +21,42 @@ Via [npm](http://github.com/isaacs/npm):
 ## Example
 
 Make sure your dog is working properly:
+```javascript
+function Dog() {}
 
-    function Dog() {}
+Dog.prototype.seeCat = function() {
+  this.bark('whuf, whuf');
+  this.run();
+}
 
-    Dog.prototype.seeCat = function() {
-      this.bark('whuf, whuf');
-      this.run();
-    }
+Dog.prototype.bark = function(bark) {
+  require('sys').puts(bark);
+}
 
-    Dog.prototype.bark = function(bark) {
-      require('sys').puts(bark);
-    }
+var gently = new (require('gently'))
+  , assert = require('assert')
+  , dog = new Dog();
 
-    var gently = new (require('gently'))
-      , assert = require('assert')
-      , dog = new Dog();
+gently.expect(dog, 'bark', function(bark) {
+  assert.equal(bark, 'whuf, whuf');
+});
+gently.expect(dog, 'run');
 
-    gently.expect(dog, 'bark', function(bark) {
-      assert.equal(bark, 'whuf, whuf');
-    });
-    gently.expect(dog, 'run');
-
-    dog.seeCat();
-
+dog.seeCat();
+```
 You can also easily test event emitters with this, for example a simple sequence of 2 events emitted by `fs.WriteStream`:
+```javascript
+var gently = new (require('gently'))
+  , stream = new (require('fs').WriteStream)('my_file.txt');
 
-    var gently = new (require('gently'))
-      , stream = new (require('fs').WriteStream)('my_file.txt');
+gently.expect(stream, 'emit', function(event) {
+  assert.equal(event, 'open');
+});
 
-    gently.expect(stream, 'emit', function(event) {
-      assert.equal(event, 'open');
-    });
-
-    gently.expect(stream, 'emit', function(event) {
-      assert.equal(event, 'drain');
-    });
-
+gently.expect(stream, 'emit', function(event) {
+  assert.equal(event, 'drain');
+});
+```
 For a full read world example, check out this test case: [test-incoming-form.js](http://github.com/felixge/node-formidable/blob/master/test/simple/test-incoming-form.js) (in [node-formdiable](http://github.com/felixge/node-formidable)).
 
 ## API
@@ -76,11 +76,11 @@ Returns a reference to the function that is getting overwritten.
 #### gently.expect([count], stubFn)
 
 Returns a function that is supposed to be executed `count` times, delegating any calls to the provided `stubFn` function. Naming your stubFn closure will help to properly diagnose errors that are being thrown:
-
-    childProcess.exec('ls', gently.expect(function lsCallback(code) {
-      assert.equal(0, code);
-    }));
-
+```javascript
+childProcess.exec('ls', gently.expect(function lsCallback(code) {
+  assert.equal(0, code);
+}));
+```
 #### gently.restore(obj, method)
 
 Restores an object method that has been previously overwritten using `gently.expect()`.
@@ -90,68 +90,68 @@ Restores an object method that has been previously overwritten using `gently.exp
 Returns a new require functions that catches a reference to all required modules into `gently.hijacked`.
 
 To use this function, include a line like this in your `'my-module.js'`.
+```javascript
+if (global.GENTLY) require = GENTLY.hijack(require);
 
-    if (global.GENTLY) require = GENTLY.hijack(require);
-
-    var sys = require('sys');
-    exports.hello = function() {
-      sys.log('world');
-    };
-
+var sys = require('sys');
+exports.hello = function() {
+  sys.log('world');
+};
+```
 Now you can write a test for the module above:
+```javascript
+var gently = global.GENTLY = new (require('gently'))
+  , myModule = require('./my-module');
 
-    var gently = global.GENTLY = new (require('gently'))
-      , myModule = require('./my-module');
+gently.expect(gently.hijacked.sys, 'log', function(str) {
+  assert.equal(str, 'world');
+});
 
-    gently.expect(gently.hijacked.sys, 'log', function(str) {
-      assert.equal(str, 'world');
-    });
-
-    myModule.hello();
-
+myModule.hello();
+```
 #### gently.stub(location, [exportsName])
 
 Returns a stub class that will be used instead of the real class from the module at `location` with the given `exportsName`.
 
 This allows to test an OOP version of the previous example, where `'my-module.js'`.
+```javascript
+if (global.GENTLY) require = GENTLY.hijack(require);
 
-    if (global.GENTLY) require = GENTLY.hijack(require);
+var World = require('./world');
 
-    var World = require('./world');
-
-    exports.hello = function() {
-      var world = new World();
-      world.hello();
-    }
-
+exports.hello = function() {
+  var world = new World();
+  world.hello();
+}
+```
 And `world.js` looks like this:
+```javascript
+var sys = require('sys');
 
-    var sys = require('sys');
+function World() {
 
-    function World() {
+}
+module.exports = World;
 
-    }
-    module.exports = World;
-
-    World.prototype.hello = function() {
-      sys.log('world');
-    };
-
+World.prototype.hello = function() {
+  sys.log('world');
+};
+```
 Testing `'my-module.js'` can now easily be accomplished:
+```javascript
+var gently = global.GENTLY = new (require('gently'))
+  , WorldStub = gently.stub('./world')
+  , myModule = require('./my-module')
+  , WORLD;
 
-    var gently = global.GENTLY = new (require('gently'))
-      , WorldStub = gently.stub('./world')
-      , myModule = require('./my-module')
-      , WORLD;
+gently.expect(WorldStub, 'new', function() {
+  WORLD = this;
+});
 
-    gently.expect(WorldStub, 'new', function() {
-      WORLD = this;
-    });
+gently.expect(WORLD, 'hello');
 
-    gently.expect(WORLD, 'hello');
-
-    myModule.hello();
-
+myModule.hello();
+```
 #### gently.hijacked
 
 An object that holds the references to all hijacked modules.
