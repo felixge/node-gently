@@ -5,6 +5,10 @@
     "lib": "./lib/gently"
   },
   "main": "./lib/gently/index",
+  "repository":{
+    "type": "git",
+    "url": "https://github.com/felixge/node-gently.git"
+  },
   "dependencies": {},
   "devDependencies": {},
   "engines": {
