@@ -280,7 +280,7 @@ test(function verify() {
     gently.verify();
     assert.ok(false, 'throw needs to happen');
   } catch (e) {
-    assert.equal(e.message, 'Expected call to [OBJ].foo() did not happen');
+    assert.ok(e.message.match(/Expected call to \[OBJ\].foo\(\) did not happen at/), 'Expected call to [OBJ].foo() did not happen at <location>');
   }
 
   try {
