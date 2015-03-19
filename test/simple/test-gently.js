@@ -1,5 +1,5 @@
 require('../common');
-var Gently = require('gently')
+var Gently = require('../..')
   , gently;
 
 function test(test) {
