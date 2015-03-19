@@ -285,9 +285,9 @@ test(function verify() {
 
   try {
     gently.verify('foo');
-    assert.ok(false, 'throw needs to happen');
+    assert.ok(false, 'throw does not need to happen, as verify() cleared out the expectations');
   } catch (e) {
-    assert.equal(e.message, 'Expected call to [OBJ].foo() did not happen (foo)');
+    assert.equal(e.message, 'throw does not need to happen, as verify() cleared out the expectations');
   }
 });
 
