@@ -1,5 +1,12 @@
 # Gently
 
+<!-- badges/ -->
+[![Build Status](https://travis-ci.org/felixge/node-gently.svg?branch=master)](https://travis-ci.org/felixge/node-gently)
+[![npm](https://img.shields.io/npm/v/gently.svg)](https://www.npmjs.com/package/gently) 
+[![Dependency Status](https://david-dm.org/felixge/node-gently.png?theme=shields.io)](https://david-dm.org/felixge/node-gently)
+[![Development Dependency Status](https://david-dm.org/felixge/node-gently/dev-status.png?theme=shields.io)](https://david-dm.org/felixge/node-gently#info=devDependencies)
+<!-- /badges -->
+
 ## Purpose
 
 A node.js module that helps with stubbing and behavior verification. It allows you to test the most remote and nested corners of your code while keeping being fully unobtrusive.
