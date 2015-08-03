@@ -1,11 +1,11 @@
 {
   "name": "gently",
-  "version": "0.9.2",
+  "version": "0.10.0",
   "directories": {
     "lib": "./lib/gently"
   },
   "main": "./lib/gently/index",
-  "repository":{
+  "repository": {
     "type": "git",
     "url": "https://github.com/felixge/node-gently.git"
   },
