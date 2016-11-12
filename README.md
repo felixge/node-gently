@@ -3,8 +3,8 @@
 <!-- badges/ -->
 [![Build Status](https://travis-ci.org/felixge/node-gently.svg?branch=master)](https://travis-ci.org/felixge/node-gently)
 [![npm](https://img.shields.io/npm/v/gently.svg)](https://www.npmjs.com/package/gently) 
-[![Dependency Status](https://david-dm.org/felixge/node-gently.png?theme=shields.io)](https://david-dm.org/felixge/node-gently)
-[![Development Dependency Status](https://david-dm.org/felixge/node-gently/dev-status.png?theme=shields.io)](https://david-dm.org/felixge/node-gently#info=devDependencies)
+[![Dependency Status](https://david-dm.org/felixge/node-gently.svg?theme=shields.io)](https://david-dm.org/felixge/node-gently)
+[![Development Dependency Status](https://david-dm.org/felixge/node-gently/dev-status.svg?theme=shields.io)](https://david-dm.org/felixge/node-gently#info=devDependencies)
 <!-- /badges -->
 
 ## Purpose
@@ -40,7 +40,7 @@ Dog.prototype.bark = function(bark) {
   require('sys').puts(bark);
 }
 
-var gently = new (require('gently'))
+const gently = new (require('gently'))
   , assert = require('assert')
   , dog = new Dog();
 
@@ -53,7 +53,7 @@ dog.seeCat();
 ```
 You can also easily test event emitters with this, for example a simple sequence of 2 events emitted by `fs.WriteStream`:
 ```javascript
-var gently = new (require('gently'))
+const gently = new (require('gently'))
   , stream = new (require('fs').WriteStream)('my_file.txt');
 
 gently.expect(stream, 'emit', function(event) {
@@ -100,14 +100,14 @@ To use this function, include a line like this in your `'my-module.js'`.
 ```javascript
 if (global.GENTLY) require = GENTLY.hijack(require);
 
-var sys = require('sys');
+const sys = require('sys');
 exports.hello = function() {
   sys.log('world');
 };
 ```
 Now you can write a test for the module above:
 ```javascript
-var gently = global.GENTLY = new (require('gently'))
+const gently = global.GENTLY = new (require('gently'))
   , myModule = require('./my-module');
 
 gently.expect(gently.hijacked.sys, 'log', function(str) {
@@ -124,16 +124,16 @@ This allows to test an OOP version of the previous example, where `'my-module.js
 ```javascript
 if (global.GENTLY) require = GENTLY.hijack(require);
 
-var World = require('./world');
+const World = require('./world');
 
 exports.hello = function() {
-  var world = new World();
+  const world = new World();
   world.hello();
 }
 ```
 And `world.js` looks like this:
 ```javascript
-var sys = require('sys');
+const sys = require('sys');
 
 function World() {
 
@@ -146,7 +146,7 @@ World.prototype.hello = function() {
 ```
 Testing `'my-module.js'` can now easily be accomplished:
 ```javascript
-var gently = global.GENTLY = new (require('gently'))
+const gently = global.GENTLY = new (require('gently'))
   , WorldStub = gently.stub('./world')
   , myModule = require('./my-module')
   , WORLD;
